@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Santo Domingo | Observatorio Márkov</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='85'%3E%E2%9B%AA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand">
+  <i class="fa-solid fa-church"></i>
+  <h2>SANTO DOMINGO</h2>
+  <small>TUNJA · COLOMBIA</small>
+ </div>
+ <nav class="nav" id="navigation">
+  <button class="active" data-tab="dashboard"><i class="fa-solid fa-chart-pie"></i> Observatorio</button>
+  <button data-tab="simulator"><i class="fa-solid fa-play"></i> Simulación</button>
+  <button data-tab="states"><i class="fa-solid fa-sitemap"></i> Estados</button>
+  <button data-tab="routes"><i class="fa-solid fa-route"></i> Recorridos</button>
+  <button data-tab="matrices"><i class="fa-solid fa-table-cells"></i> Matrices</button>
+  <button data-tab="diagnosis"><i class="fa-solid fa-compass"></i> Diagnóstico</button>
+ </nav>
+ <div class="sidebar-foot">
+  <div style="color:var(--gold);font-family:Cinzel,serif">✦ LABORATORIO MÁRKOV ✦</div>
+  Modelo académico de navegación<br>
+  Universidad · Proyecto de Simulación
+ </div>
+</aside>
+
+<main class="main">
+<header class="hero">
+ <div class="hero-inner">
+  <div class="eyebrow">PATRIMONIO · CIENCIA · EXPERIENCIA DIGITAL</div>
+  <h1>Los caminos de<br><em>Santo Domingo</em></h1>
+  <div class="ornament">✦ ─── ✧ ─── ✦</div>
+  <p>Un observatorio de decisiones digitales inspirado en el patrimonio colonial de Tunja. Explora los recorridos de los visitantes y descubre cómo evolucionan sus decisiones mediante cadenas de Márkov.</p>
+ </div>
+</header>
+
+<div class="content">
+<section class="section active" id="dashboard">
+ <div class="section-head">
+  <div><div class="kicker">01 / Vista general</div><h2>El observatorio</h2><div class="subtitle">Una mirada al comportamiento de los visitantes simulados.</div></div>
+  <button class="outline-btn" onclick="showTab('simulator')"><i class="fa-solid fa-sliders"></i> Configurar experimento</button>
+ </div>
+ <div class="grid grid-5" id="kpis"></div>
+ <div class="grid grid-2" style="margin-top:20px">
+  <div class="panel"><h3>Destino de los visitantes</h3><div class="chart-container"><canvas id="donut"></canvas></div></div>
+  <div class="panel"><h3>Distribución de resultados</h3><div class="chart-container"><canvas id="bars"></canvas></div></div>
+ </div>
+ <div class="grid grid-3" style="margin-top:20px">
+  <div class="panel"><div class="kicker">Estados modelados</div><div class="value" style="font:32px Cinzel;color:var(--gold);margin:16px 0" id="countStates">34</div><div class="muted">Puntos de interacción y desenlaces.</div></div>
+  <div class="panel"><div class="kicker">Recorridos base</div><div class="value" style="font:32px Cinzel;color:var(--gold);margin:16px 0" id="countRoutes">90</div><div class="muted">Historias hipotéticas de navegación.</div></div>
+  <div class="panel"><div class="kicker">Punto crítico</div><div class="value" style="font:25px Cinzel;color:var(--gold);margin:16px 0" id="criticalShort">—</div><div class="muted">Mayor cantidad de abandonos directos.</div></div>
+ </div>
+ <div class="panel" style="margin-top:20px"><h3>Resultados por perfil</h3><div id="profileResults"></div></div><div class="panel" style="margin-top:20px"><h3>Recorridos simulados más frecuentes</h3><div id="topRoutes"></div></div><div class="notice" style="margin-top:20px">Este es un modelo académico construido con recorridos hipotéticos. No representa analítica observada del sitio real de la Iglesia Santo Domingo.</div>
+</section>
+
+<section class="section" id="simulator">
+ <div class="section-head"><div><div class="kicker">02 / Experimento</div><h2>Simulación de visitantes</h2><div class="subtitle">Cada visitante recorre una cadena de estados hasta un desenlace o el límite de pasos.</div></div></div>
+ <div class="grid grid-2">
+  <div class="panel">
+   <h3>Parámetros del experimento</h3>
+   <div class="control"><label>Número de usuarios (mínimo 1.000)</label><input id="users" type="number" min="1000" max="100000" step="500" value="1000"></div>
+   <div class="control"><label>Máximo de pasos: <strong id="stepsLabel">35</strong></label><input id="steps" type="range" min="5" max="100" value="35"></div>
+   <div class="control"><label>Semilla aleatoria</label><input id="seed" type="number" min="0" max="999999" value="42"></div>
+   <div id="profileWeights"></div><button class="gold-btn" id="runButton" onclick="runSimulation()" style="width:100%"><i class="fa-solid fa-bolt"></i> Ejecutar Simulación Márkov</button>
+   <div class="progress"><span id="progress"></span></div>
+   <p class="muted" id="status" style="font-size:12px">Modelo preparado.</p>
+  </div>
+  <div class="panel">
+   <h3>Monitor de ejecución</h3>
+   <div class="statline"><span>Visitantes procesados</span><strong id="processed">0</strong></div>
+   <div class="statline"><span>Éxito</span><strong id="successCount">0</strong></div>
+   <div class="statline"><span>Abandono</span><strong id="abandonCount">0</strong></div>
+   <div class="statline"><span>Error</span><strong id="errorCount">0</strong></div>
+   <div class="statline"><span>Seguimiento pendiente</span><strong id="pendingCount">0</strong></div>
+   <div class="statline"><span>Sin finalizar</span><strong id="unfinishedCount">0</strong></div>
+   <div class="notice">Python procesa el experimento en el servidor. El monitor muestra los resultados al finalizar. No registra visitantes reales.</div>
+  </div>
+ </div>
+ <div class="panel" style="margin-top:20px">
+  <div class="section-head"><h3>Últimos recorridos simulados</h3><button class="outline-btn" onclick="downloadSimulation()">Exportar CSV</button></div>
+  <div class="feed" id="feed"></div>
+ </div>
+</section>
+
+<section class="section" id="states">
+ <div class="section-head"><div><div class="kicker">03 / Arquitectura del modelo</div><h2>Los 34 estados</h2><div class="subtitle">El vocabulario de decisiones y desenlaces del templo digital.</div></div></div>
+ <div class="panel">
+  <div class="toolbar"><input id="stateSearch" placeholder="Buscar estado, nombre o descripción..." oninput="renderStates()"><select id="stateType" onchange="renderStates()"><option value="">Todos los tipos</option><option>Inicial</option><option>Intermedio</option><option>Final exitoso</option><option>Final negativo</option><option>Error</option><option>Seguimiento</option></select></div>
+  <div class="table-wrap"><table><thead><tr><th>Código</th><th>Nombre</th><th>Descripción</th><th>Tipo</th></tr></thead><tbody id="statesBody"></tbody></table></div>
+ </div>
+</section>
+
+<section class="section" id="routes">
+ <div class="section-head"><div><div class="kicker">04 / Experiencias de navegación</div><h2>Recorridos base</h2><div class="subtitle">90 caminos diseñados para representar diferentes objetivos, retrocesos y dificultades.</div></div></div>
+ <div class="panel">
+  <div class="toolbar"><select id="profileFilter" onchange="renderRoutes()"><option value="">Todos los perfiles</option></select><select id="resultFilter" onchange="renderRoutes()"><option value="">Todos los resultados</option><option>Éxito</option><option>Abandono</option><option>Error</option><option>Seguimiento pendiente</option></select></div>
+  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Perfil</th><th>Recorrido</th><th>Resultado</th><th>Pasos</th></tr></thead><tbody id="routesBody"></tbody></table></div>
+ </div>
+</section>
+
+<section class="section" id="matrices">
+ <div class="section-head"><div><div class="kicker">05 / Núcleo matemático</div><h2>Matrices de transición</h2><div class="subtitle">De los recorridos base a las probabilidades de cada decisión.</div></div></div>
+ <div class="toolbar"><label for="matrixProfile">Perfil de la matriz</label><select id="matrixProfile" onchange="renderMatrices()"></select></div>
+ <div class="grid grid-2">
+  <div class="panel"><h3>Matriz de conteos</h3><div class="subtitle">Frecuencia de transiciones observadas en los recorridos hipotéticos.</div><div class="heatmap" id="countHeat" style="margin-top:20px"></div></div>
+  <div class="panel"><h3>Matriz de probabilidades</h3><div class="subtitle">Cada fila representa una distribución de probabilidad y suma 1.</div><div class="heatmap" id="probHeat" style="margin-top:20px"></div></div>
+ </div>
+ <div class="panel" style="margin-top:20px">
+  <h3>Explorador de transiciones</h3>
+  <div class="toolbar"><select id="originSelect" onchange="renderTransitions()"></select></div>
+  <div id="transitions"></div>
+ </div>
+</section>
+
+<section class="section" id="diagnosis">
+ <div class="section-head"><div><div class="kicker">06 / Inteligencia de navegación</div><h2>Diagnóstico y mejora</h2><div class="subtitle">Localiza puntos de fricción y experimenta con un cambio probabilístico.</div></div></div>
+ <div class="grid grid-2">
+  <div class="panel">
+   <div class="kicker">Punto de mayor abandono</div>
+   <h2 id="criticalName">—</h2>
+   <p class="subtitle" id="criticalInfo">Ejecuta una simulación para analizar los abandonos.</p>
+   <div class="notice">Este diagnóstico mide abandonos directos. Una alta frecuencia no demuestra por sí sola la causa de un problema de usabilidad.</div>
+  </div>
+  <div class="panel">
+   <h3>Intervención hipotética</h3>
+   <p class="subtitle">Reduce la probabilidad de abandono del estado crítico y redistribuye esa probabilidad hacia otras salidas previamente observadas.</p>
+   <div class="control"><label>Reducción relativa del abandono: <strong id="improveLabel">30%</strong></label><input id="improvement" type="range" min="5" max="90" step="5" value="30"></div>
+   <button class="gold-btn" onclick="runImprovement()">Comparar antes y después</button>
+  </div>
+ </div>
+ <div class="panel" style="margin-top:20px">
+  <h3>Comparación de escenarios</h3>
+  <div class="compare"><div><div class="kicker">Éxito inicial</div><div class="big" id="beforeSuccess">—</div></div><i class="fa-solid fa-arrow-right-long"></i><div><div class="kicker">Éxito mejorado</div><div class="big" id="afterSuccess">—</div></div></div>
+  <div class="chart-container" style="margin-top:25px"><canvas id="compareChart"></canvas></div>
+  <div id="transitionChange"></div><div id="comparisonTable" style="margin-top:20px"></div>
+ </div>
+ <div class="panel" style="margin-top:20px"><h3>Interpretación del proyecto</h3><div id="answers" class="subtitle"></div><h3>Ranking de abandonos directos</h3><div id="criticalRanking"></div></div>
+</section>
+</div>
+<footer class="footer">✦ SANTO DOMINGO · TUNJA ✦ &nbsp;|&nbsp; OBSERVATORIO DE NAVEGACIÓN &nbsp;|&nbsp; MODELO ACADÉMICO NO OFICIAL</footer>
+</main>
+</div>
+
+<script src="/static/js/script.js" defer></script>
+</body>
+</html>
